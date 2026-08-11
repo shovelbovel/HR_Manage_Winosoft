@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Deny-all by default, same rationale as firestore.rules: the server (Admin
+// SDK) bypasses these rules; they exist as defense in depth only.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

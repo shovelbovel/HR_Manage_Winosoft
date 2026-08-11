@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# uv / venv
+.venv/
+.python-version
+
+# Env / secrets
+.env
+*.local
+
+# Docker
+*.log
+
+# Firebase emulator local state
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

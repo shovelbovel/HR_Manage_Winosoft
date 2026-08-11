@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — HR Management{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand navbar-light bg-white border-bottom">
+  <div class="container-fluid">
+    <span class="navbar-brand">
+      <i class="bi bi-speedometer2 text-primary"></i>
+      HR Management
+    </span>
+    <form method="post" action="/logout" class="d-flex">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-box-arrow-right"></i> Déconnexion
+      </button>
+    </form>
+  </div>
+</nav>
+
+<div class="container flex-grow-1 py-4">
+  <h1 class="h3">Tableau de bord</h1>
+  <p class="text-muted">
+    Ceci est un placeholder du module 2. Il prouve que la dépendance
+    <code>get_current_user</code> protège correctement cette route.
+  </p>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      <h2 class="h6 card-title">Session actuelle</h2>
+      <dl class="row mb-0">
+        <dt class="col-4">Email</dt>
+        <dd class="col-8">{{ current_user.email }}</dd>
+        <dt class="col-4">Rôle</dt>
+        <dd class="col-8"><span class="badge bg-primary">{{ current_user.role.value }}</span></dd>
+        <dt class="col-4">ID employé</dt>
+        <dd class="col-8">{{ current_user.employee_id or "—" }}</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

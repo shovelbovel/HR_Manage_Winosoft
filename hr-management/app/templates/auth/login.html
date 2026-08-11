@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion — HR Management{% endblock %}
+
+{% block content %}
+<div class="container flex-grow-1 d-flex align-items-center justify-content-center">
+  <div class="card shadow-sm" style="max-width: 420px; width: 100%;">
+    <div class="card-body p-4">
+      <h1 class="h4 mb-4 text-center">
+        <i class="bi bi-people-fill text-primary"></i>
+        HR Management
+      </h1>
+
+      {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/login">
+        <div class="mb-3">
+          <label for="email" class="form-label">Adresse email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            required
+            autofocus
+          />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Mot de passe</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
