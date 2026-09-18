@@ -1,1 +1,338 @@
 /* Project-wide overrides on top of Bootstrap 5 go here as modules are added. */
+
+/* ---------------------------------------------------------------------- */
+/* Brand design tokens                                                    */
+/* ---------------------------------------------------------------------- */
+:root {
+  --brand-teal-50: #f0fdfa;
+  --brand-teal-100: #ccfbf1;
+  --brand-teal-200: #99f6e4;
+  --brand-teal-500: #14b8a6;
+  --brand-teal-600: #0d9488;
+  --brand-teal-700: #0f766e;
+  --brand-teal-900: #134e4a;
+
+  --card-mint-bg: #ecfdf5;
+  --card-mint-fg: #047857;
+  --card-peach-bg: #fff7ed;
+  --card-peach-fg: #c2410c;
+  --card-gray-bg: #f9fafb;
+  --card-gray-fg: #374151;
+  --card-blue-bg: #eff6ff;
+  --card-blue-fg: #1d4ed8;
+
+  --ink-900: #111827;
+  --ink-600: #4b5563;
+  --border-subtle: #e5e7eb;
+
+  --sidebar-width: 272px;
+  --radius-lg: 1rem;
+  --radius-pill: 9999px;
+}
+
+body {
+  background-color: #fafafa;
+  color: var(--ink-900);
+}
+
+/* Bootstrap's component classes bake literal colors into their own
+   --bs-btn-* custom properties at build time (not a live reference to
+   --bs-primary), so the brand color has to be re-applied per component
+   class rather than by redefining --bs-primary once at :root. */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand-teal-600);
+  --bs-btn-border-color: var(--brand-teal-600);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-teal-700);
+  --bs-btn-hover-border-color: var(--brand-teal-700);
+  --bs-btn-focus-shadow-rgb: 13, 148, 136;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-teal-700);
+  --bs-btn-active-border-color: var(--brand-teal-700);
+  --bs-btn-disabled-bg: var(--brand-teal-600);
+  --bs-btn-disabled-border-color: var(--brand-teal-600);
+  border-radius: var(--radius-pill);
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--brand-teal-600);
+  --bs-btn-border-color: var(--brand-teal-600);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-teal-600);
+  --bs-btn-hover-border-color: var(--brand-teal-600);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-teal-600);
+  --bs-btn-active-border-color: var(--brand-teal-600);
+  --bs-btn-focus-shadow-rgb: 13, 148, 136;
+  border-radius: var(--radius-pill);
+}
+
+.text-primary {
+  color: var(--brand-teal-600) !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--brand-teal-600);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--brand-teal-500);
+  box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.25);
+}
+
+a {
+  color: var(--brand-teal-700);
+}
+a:hover {
+  color: var(--brand-teal-900);
+}
+
+/* WCAG AA: a visible focus ring on every interactive element reached by
+   keyboard, not just the ones Bootstrap already styles by default. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Respect the OS-level reduced-motion preference: collapse/fade/toast
+   transitions become instant instead of animated. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Rows made clickable via onclick="window.location=…" (list tables) need a
+   keyboard/AT-visible affordance too; the pointer cursor alone isn't enough. */
+tr[onclick] {
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------- */
+/* App shell: left sidebar + main content                                 */
+/* ---------------------------------------------------------------------- */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* The sidebar is a Bootstrap .offcanvas by default (an off-screen drawer,
+   correct on mobile) — this media query re-docks it as a normal static
+   column once there's room for it, without needing separate markup for
+   the two states. */
+@media (min-width: 992px) {
+  .sidebar.offcanvas {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    z-index: 1;
+    display: flex;
+    visibility: visible;
+    transform: none;
+    width: var(--sidebar-width);
+    flex: 0 0 var(--sidebar-width);
+    height: 100vh;
+    border-right: 1px solid var(--border-subtle);
+    box-shadow: none;
+    background-color: #fff;
+  }
+  .sidebar-topbar {
+    display: none;
+  }
+}
+@media (max-width: 991.98px) {
+  .sidebar.offcanvas {
+    width: min(85vw, 300px);
+  }
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.25rem 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink-900);
+  text-decoration: none;
+}
+.sidebar-brand:hover {
+  color: var(--ink-900);
+}
+.sidebar-brand i {
+  color: var(--brand-teal-600);
+  font-size: 1.4rem;
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0.75rem 0.5rem;
+  padding: 0.6rem 0.6rem;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: transparent;
+  width: calc(100% - 1.5rem);
+  text-align: left;
+}
+.sidebar-profile:hover {
+  background-color: var(--card-gray-bg);
+}
+.sidebar-profile-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--brand-teal-100);
+  color: var(--brand-teal-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.sidebar-profile-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink-900);
+}
+.sidebar-profile-role {
+  font-size: 0.75rem;
+  color: var(--ink-600);
+}
+
+.sidebar-divider {
+  border-top: 1px solid var(--border-subtle);
+  margin: 0.5rem 0.75rem 0.75rem;
+}
+
+.sidebar-nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.sidebar-nav-section {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-600);
+  padding: 0.75rem 0.6rem 0.25rem;
+}
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-lg);
+  color: var(--ink-600);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+.sidebar-nav-link i {
+  font-size: 1.05rem;
+  width: 1.2rem;
+  text-align: center;
+}
+.sidebar-nav-link:hover {
+  background-color: var(--card-gray-bg);
+  color: var(--ink-900);
+}
+.sidebar-nav-link.active {
+  background-color: var(--brand-teal-50);
+  color: var(--brand-teal-700);
+  font-weight: 600;
+}
+
+.sidebar-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 1.5rem 1.75rem 2.5rem;
+}
+.main-content-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.main-content-header h1 {
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Colored stat cards (dashboard KPIs)                                    */
+/* ---------------------------------------------------------------------- */
+.stat-card {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.4rem;
+  height: 100%;
+}
+.stat-card .stat-card-icon {
+  font-size: 1.4rem;
+  opacity: 0.85;
+}
+.stat-card .stat-card-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.stat-card .stat-card-label {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.stat-card--mint {
+  background-color: var(--card-mint-bg);
+  color: var(--card-mint-fg);
+}
+.stat-card--peach {
+  background-color: var(--card-peach-bg);
+  color: var(--card-peach-fg);
+}
+.stat-card--gray {
+  background-color: var(--card-gray-bg);
+  color: var(--card-gray-fg);
+}
+.stat-card--blue {
+  background-color: var(--card-blue-bg);
+  color: var(--card-blue-fg);
+}
+
+.panel-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: #fff;
+}

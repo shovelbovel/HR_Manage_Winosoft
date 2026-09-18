@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Attestations — HR Management{% endblock %}
+
+{% block content %}
+{% set TYPE_LABELS = {
+  "work": "Attestation de travail",
+  "internship": "Attestation de stage",
+  "leave": "Attestation de congé",
+  "salary": "Attestation de salaire",
+  "end_of_contract": "Certificat de fin de contrat"
+} %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ '/home' if current_user.role.value == 'employee' else '/dashboard' }}">
+          {{ 'Accueil' if current_user.role.value == 'employee' else 'Tableau de bord' }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{% if mine %}Mes attestations{% else %}Attestations{% endif %}</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-file-earmark-pdf"></i> {% if mine %}Mes attestations{% else %}Attestations{% endif %}</h1>
+
+  {% if certificates %}
+  <div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+      <thead>
+        <tr>
+          <th>Numéro</th>
+          <th>Type</th>
+          <th>Employé</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for certificate in certificates %}
+        <tr onclick="window.location='/certificates/{{ certificate.id }}'" style="cursor: pointer;">
+          <td>{{ certificate.number }}</td>
+          <td>{{ TYPE_LABELS[certificate.certificate_type.value] }}</td>
+          <td>{{ certificate.data_snapshot.employee_name }}</td>
+          <td>{{ certificate.created_at.strftime("%d/%m/%Y") }}</td>
+          <td>
+            <a
+              href="/certificates/{{ certificate.id }}/download"
+              class="btn btn-outline-secondary btn-sm"
+              onclick="event.stopPropagation()"
+            >
+              <i class="bi bi-download"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a href="?cursor={{ next_cursor }}" class="btn btn-outline-secondary">
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucune attestation pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

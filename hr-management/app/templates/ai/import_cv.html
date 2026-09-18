@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Assistant — Importer un CV — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Assistant — Importer un CV</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-stars"></i> Assistant — Importer un CV</h1>
+  <p class="text-muted">
+    Formats acceptés : PDF, DOCX. 5 Mo maximum. Les champs reconnus
+    pré-rempliront le formulaire de création d'employé — vous devrez les
+    vérifier avant d'enregistrer.
+  </p>
+
+  <div id="error-alert" class="alert alert-danger d-none" role="alert"></div>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      <form id="cv-form">
+        <div class="mb-3">
+          <label class="form-label">Fichier CV</label>
+          <input type="file" class="form-control" id="cv-file" accept=".pdf,.docx" required />
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-button">
+          <i class="bi bi-upload"></i> Analyser
+        </button>
+        <span id="progress" class="d-none ms-2">
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+          Analyse en cours… (jusqu'à 60 secondes)
+        </span>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("cv-form");
+  const fileInput = document.getElementById("cv-file");
+  const submitButton = document.getElementById("submit-button");
+  const progress = document.getElementById("progress");
+  const errorAlert = document.getElementById("error-alert");
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    errorAlert.classList.add("d-none");
+    submitButton.disabled = true;
+    progress.classList.remove("d-none");
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      const response = await fetch("/ai/import-cv", {
+        method: "POST",
+        headers: { accept: "application/json" },
+        body: formData,
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        throw new Error(body.detail || "Une erreur est survenue.");
+      }
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(body)) {
+        if (value !== null && value !== undefined && value !== "") {
+          params.set(key, value);
+        }
+      }
+      window.location.href = "/employees/create?" + params.toString();
+    } catch (error) {
+      errorAlert.textContent = error.message;
+      errorAlert.classList.remove("d-none");
+      submitButton.disabled = false;
+      progress.classList.add("d-none");
+    }
+  });
+</script>
+{% endblock %}

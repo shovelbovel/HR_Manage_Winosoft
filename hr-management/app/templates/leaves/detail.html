@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Demande de congé — HR Management{% endblock %}
+
+{% block content %}
+{% set STATUS_BADGES = {
+  "pending": ("En attente", "#F1C40F", "#000"),
+  "approved": ("Approuvé", "#27AE60", "#fff"),
+  "rejected": ("Refusé", "#E74C3C", "#fff")
+} %}
+{% set badge = STATUS_BADGES[leave.status.value] %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/leaves/my">Congés</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Demande</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card" style="max-width: 560px;">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h2 class="h5 mb-0">{{ leave.employee_name }}</h2>
+        <span class="badge" style="background-color: {{ badge[1] }}; color: {{ badge[2] }};">
+          {{ badge[0] }}
+        </span>
+      </div>
+      <dl class="row">
+        <dt class="col-4">Type</dt>
+        <dd class="col-8">{{ leave.leave_type_name }}</dd>
+        <dt class="col-4">Période</dt>
+        <dd class="col-8">
+          {{ leave.start_date.strftime('%Y-%m-%d') }} → {{ leave.end_date.strftime('%Y-%m-%d') }}
+        </dd>
+        <dt class="col-4">Jours ouvrés</dt>
+        <dd class="col-8">{{ leave.working_days }}</dd>
+        {% if leave.reason %}
+        <dt class="col-4">Motif</dt>
+        <dd class="col-8">{{ leave.reason }}</dd>
+        {% endif %}
+        {% if leave.rejection_reason %}
+        <dt class="col-4">Motif de refus</dt>
+        <dd class="col-8">{{ leave.rejection_reason }}</dd>
+        {% endif %}
+      </dl>
+
+      {% if can_decide %}
+      <hr />
+      <div class="d-flex gap-2">
+        <form method="post" action="/leaves/{{ leave.id }}/approve">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-lg"></i> Approuver
+          </button>
+        </form>
+      </div>
+      <form
+        method="post"
+        action="/leaves/{{ leave.id }}/reject"
+        class="mt-2"
+        data-confirm="Refuser cette demande de congé de {{ leave.employee_name }} ?"
+        data-confirm-label="Refuser"
+      >
+        <label for="rejection-reason" class="form-label">Motif de refus</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="rejection-reason" name="reason" required maxlength="500" />
+          <button type="submit" class="btn btn-outline-danger">
+            <i class="bi bi-x-lg"></i> Refuser
+          </button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

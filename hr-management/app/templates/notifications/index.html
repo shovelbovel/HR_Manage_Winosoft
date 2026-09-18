@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications — HR Management{% endblock %}
+
+{% block content %}
+{% set CATEGORY_ICONS = {
+  "contract_expiring": ("bi-exclamation-triangle-fill", "#E74C3C"),
+  "internship_ending": ("bi-mortarboard-fill", "#F1C40F"),
+  "trial_period": ("bi-hourglass-split", "#F1C40F"),
+  "leave_pending": ("bi-calendar-check-fill", "#F1C40F"),
+  "leave_decision": ("bi-calendar-check-fill", "#3498DB"),
+  "birthday": ("bi-gift-fill", "#9B59B6"),
+  "missing_documents": ("bi-file-earmark-excel-fill", "#95A5A6"),
+  "new_employee": ("bi-person-plus-fill", "#27AE60"),
+} %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ '/home' if current_user.role.value == 'employee' else '/dashboard' }}">
+          {{ 'Accueil' if current_user.role.value == 'employee' else 'Tableau de bord' }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Notifications</li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-bell-fill"></i> Notifications</h1>
+    <form method="post" action="/notifications/mark-all-read">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">Tout marquer comme lu</button>
+    </form>
+  </div>
+
+  {% if notifications %}
+  <div class="list-group">
+    {% for notification in notifications %}
+    {% set icon, color = CATEGORY_ICONS.get(notification.category.value, ("bi-bell", "#95A5A6")) %}
+    <div class="list-group-item d-flex justify-content-between align-items-start {% if not notification.is_read %}bg-light{% endif %}">
+      <div class="d-flex gap-2 align-items-start">
+        <i class="bi {{ icon }}" style="color: {{ color }};"></i>
+        <div>
+          <div class="{% if not notification.is_read %}fw-semibold{% endif %}">
+            {% if notification.link %}
+            <a href="{{ notification.link }}" class="text-reset text-decoration-none">{{ notification.message }}</a>
+            {% else %}
+            {{ notification.message }}
+            {% endif %}
+          </div>
+          <div class="text-muted small">{{ notification.created_at.strftime("%d/%m/%Y %H:%M") }}</div>
+        </div>
+      </div>
+      {% if not notification.is_read %}
+      <form method="post" action="/notifications/{{ notification.id }}/read">
+        <button type="submit" class="btn btn-link btn-sm p-0">Marquer comme lu</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a href="?cursor={{ next_cursor }}" class="btn btn-outline-secondary">
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucune notification pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -8,7 +8,19 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
 from app.core.exceptions import ResourceOutOfScopeError
 from app.core.firestore_client import get_firestore_client
-from app.routers import auth_router, dashboard_router
+from app.routers import (
+    ai_router,
+    auth_router,
+    certificates_router,
+    dashboard_router,
+    departments_router,
+    employees_router,
+    leaves_router,
+    notifications_router,
+    positions_router,
+    settings_router,
+    trial_periods_router,
+)
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -29,6 +41,15 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_router.router)
     app.include_router(dashboard_router.router)
+    app.include_router(departments_router.router)
+    app.include_router(positions_router.router)
+    app.include_router(employees_router.router)
+    app.include_router(leaves_router.router)
+    app.include_router(trial_periods_router.router)
+    app.include_router(notifications_router.router)
+    app.include_router(certificates_router.router)
+    app.include_router(settings_router.router)
+    app.include_router(ai_router.router)
 
     @app.exception_handler(ResourceOutOfScopeError)
     async def resource_out_of_scope_handler(request: Request, exc: ResourceOutOfScopeError):

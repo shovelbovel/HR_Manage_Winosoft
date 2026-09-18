@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Personnel — HR Management{% endblock %}
+
+{% block content %}
+{% set STATUS_BADGES = {
+  "trial": ("Période d'essai", "#F1C40F", "#000"),
+  "active": ("Actif", "#27AE60", "#fff"),
+  "expired": ("Contrat expiré", "#E74C3C", "#fff"),
+  "inactive": ("Inactif", "#95A5A6", "#fff")
+} %}
+
+<div class="container-fluid flex-grow-1 py-4 px-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Personnel</li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-people-fill"></i> Personnel</h1>
+    <div class="d-flex gap-2">
+      <a href="/employees/export" class="btn btn-outline-secondary" id="export-link">
+        <i class="bi bi-download"></i> Exporter CSV
+      </a>
+      <a href="/employees/create" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Ajouter un employé
+      </a>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <form method="get" action="/employees" class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label form-label-sm" for="search">Recherche</label>
+      <input id="search" type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="Nom, CIN, matricule…" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label form-label-sm" for="department-id">Département</label>
+      <select id="department-id" class="form-select" name="department_id">
+        <option value="">Tous</option>
+        {% for department in departments %}
+        <option value="{{ department.id }}" {% if department.id == filters.department_id %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label form-label-sm" for="status">Statut</label>
+      <select id="status" class="form-select" name="status">
+        <option value="">Tous</option>
+        {% for value, (label, color, text_color) in STATUS_BADGES.items() %}
+        <option value="{{ value }}" {% if value == filters.status %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label form-label-sm" for="contract-type">Type de contrat</label>
+      <select id="contract-type" class="form-select" name="contract_type">
+        <option value="">Tous</option>
+        {% for value in ["CDI", "CDD", "STAGE"] %}
+        <option value="{{ value }}" {% if value == filters.contract_type %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label form-label-sm" for="limit">Par page</label>
+      <select id="limit" class="form-select" name="limit">
+        {% for size in [10, 25, 50] %}
+        <option value="{{ size }}" {% if size == filters.limit %}selected{% endif %}>{{ size }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+    </div>
+  </form>
+
+  {% if employees %}
+  <div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+      <thead>
+        <tr>
+          <th>Matricule</th>
+          <th>Nom</th>
+          <th>CIN</th>
+          <th>Poste</th>
+          <th>Département</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for employee in employees %}
+        {% set badge = STATUS_BADGES[employee.status.value] %}
+        <tr onclick="window.location='/employees/{{ employee.id }}'" style="cursor: pointer;">
+          <td><code>{{ employee.matricule }}</code></td>
+          <td>{{ employee.last_name }} {{ employee.first_name }}</td>
+          <td>{{ employee.cin }}</td>
+          <td>{{ employee.position_title }}</td>
+          <td>{{ employee.department_name }}</td>
+          <td>
+            <span class="badge" style="background-color: {{ badge[1] }}; color: {{ badge[2] }};">
+              {{ badge[0] }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a
+      href="/employees?cursor={{ next_cursor }}&limit={{ filters.limit }}{% if filters.department_id %}&department_id={{ filters.department_id }}{% endif %}{% if filters.status %}&status={{ filters.status }}{% endif %}{% if filters.contract_type %}&contract_type={{ filters.contract_type }}{% endif %}{% if filters.search %}&search={{ filters.search }}{% endif %}"
+      class="btn btn-outline-secondary"
+    >
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucun employé pour le moment.</p>
+  {% endif %}
+</div>
+
+<script>
+  // Keep the "Exporter CSV" link's query string in sync with the current
+  // filter form so the export honors the same filters as the list view.
+  document.addEventListener("DOMContentLoaded", function () {
+    var params = new URLSearchParams(window.location.search);
+    params.delete("cursor");
+    document.getElementById("export-link").href = "/employees/export?" + params.toString();
+  });
+</script>
+{% endblock %}

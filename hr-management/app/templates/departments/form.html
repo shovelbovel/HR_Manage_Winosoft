@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{% if department %}{{ department.name }}{% else %}Nouveau département{% endif %} — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/departments">Départements</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {% if department %}{{ department.name }}{% else %}Nouveau{% endif %}
+      </li>
+    </ol>
+  </nav>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="{% if department %}/departments/{{ department.id }}{% else %}/departments{% endif %}">
+        <div class="mb-3">
+          <label for="code" class="form-label">Code</label>
+          {% if department %}
+          <input type="text" class="form-control" id="code" value="{{ department.code }}" disabled />
+          <div class="form-text">Le code est immuable après création.</div>
+          {% else %}
+          <input
+            type="text"
+            class="form-control"
+            id="code"
+            name="code"
+            required
+            minlength="2"
+            maxlength="10"
+            placeholder="ex. IT"
+          />
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label for="name" class="form-label">Nom</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+            maxlength="100"
+            value="{% if department %}{{ department.name }}{% endif %}"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+
+      {% if department %}
+      <hr />
+      <form
+        method="post"
+        action="/departments/{{ department.id }}/delete"
+        data-confirm="Supprimer le département « {{ department.name }} » ? Cette action est irréversible."
+        data-confirm-label="Supprimer"
+      >
+        <button type="submit" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-trash"></i> Supprimer ce département
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

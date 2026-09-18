@@ -14,7 +14,9 @@ RUN npm install -g firebase-tools@13.29.1
 
 WORKDIR /srv
 
+COPY docker/emulator-entrypoint.sh /usr/local/bin/emulator-entrypoint.sh
+RUN chmod +x /usr/local/bin/emulator-entrypoint.sh
+
 EXPOSE 4000 8080 9099 9199
 
-ENTRYPOINT ["firebase", "emulators:start", "--project", "hr-management-dev"]
-CMD ["--only", "firestore,auth,storage"]
+ENTRYPOINT ["/usr/local/bin/emulator-entrypoint.sh"]

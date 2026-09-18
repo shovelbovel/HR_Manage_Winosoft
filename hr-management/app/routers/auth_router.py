@@ -4,13 +4,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
-from pydantic import ValidationError
 
 from app.core import security
 from app.core.config import Settings, get_settings
 from app.core.dependencies import get_auth_service
+from app.core.http import read_body, wants_json
 from app.core.templating import templates
-from app.models import LoginRequest, TokenPair
+from app.models import LoginRequest, TokenPair, UserRole
 from app.services.auth_service import GENERIC_AUTH_ERROR, AuthService
 
 router = APIRouter(tags=["auth"])
@@ -18,9 +18,10 @@ router = APIRouter(tags=["auth"])
 _REFRESH_COOKIE_PATH = "/refresh"
 
 
-def _wants_json(request: Request) -> bool:
-    accept = request.headers.get("accept", "")
-    return "application/json" in accept and "text/html" not in accept
+def _landing_page(role: UserRole) -> str:
+    # Access matrix (page 11): "Tableau de bord complet" is Admin/Manager;
+    # Employé gets the distinct "Page d'accueil simplifiée" instead.
+    return "/home" if role == UserRole.EMPLOYEE else "/dashboard"
 
 
 def _set_auth_cookies(response: Response, token_pair: TokenPair, settings: Settings) -> None:
@@ -44,36 +45,20 @@ def _set_auth_cookies(response: Response, token_pair: TokenPair, settings: Setti
     )
 
 
-async def _read_credentials(request: Request) -> LoginRequest:
-    """Read email/password from either a JSON body (AJAX) or an HTML form
-    POST — same route serves both, per the cahier des charges' "same service
-    renders HTML pages and JSON for AJAX calls" principle.
-    """
-    content_type = request.headers.get("content-type", "")
-    if "application/json" in content_type:
-        payload = await request.json()
-    else:
-        form = await request.form()
-        payload = {"email": form.get("email"), "password": form.get("password")}
-
-    try:
-        return LoginRequest.model_validate(payload)
-    except ValidationError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing or invalid credentials"
-        ) from exc
-
-
 @router.get("/login")
 def login_page(request: Request, settings: Annotated[Settings, Depends(get_settings)]):
     token = request.cookies.get(settings.cookie_name)
     if token:
         try:
-            security.decode_token(token, expected_type="access", settings=settings)
+            payload = security.decode_token(token, expected_type="access", settings=settings)
         except security.TokenError:
             pass
         else:
-            return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+            # payload.role is always set on an access token in practice
+            # (create_access_token always supplies one) — "/dashboard" is
+            # just a defensive fallback, never expected to trigger.
+            landing = _landing_page(payload.role) if payload.role else "/dashboard"
+            return RedirectResponse(url=landing, status_code=status.HTTP_303_SEE_OTHER)
     return templates.TemplateResponse(request, "auth/login.html", {"error": None})
 
 
@@ -83,13 +68,13 @@ async def login_submit(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
     settings: Annotated[Settings, Depends(get_settings)],
 ):
-    wants_json = _wants_json(request)
-    credentials = await _read_credentials(request)
+    json_wanted = wants_json(request)
+    credentials = await read_body(request, LoginRequest)
 
     result = auth_service.authenticate(credentials.email, credentials.password)
 
     if not result.success or result.user is None:
-        if wants_json:
+        if json_wanted:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=GENERIC_AUTH_ERROR
             )
@@ -102,10 +87,10 @@ async def login_submit(
 
     token_pair = auth_service.issue_token_pair(result.user)
 
-    if wants_json:
+    if json_wanted:
         return token_pair
 
-    response = RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse(url=_landing_page(result.user.role), status_code=status.HTTP_303_SEE_OTHER)
     _set_auth_cookies(response, token_pair, settings)
     return response
 

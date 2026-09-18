@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvel utilisateur — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/settings/users">Utilisateurs</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Nouvel utilisateur</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      <form method="post" action="/settings/users">
+        <div class="mb-3">
+          <label class="form-label" for="email">Email</label>
+          <input id="email" type="email" class="form-control" name="email" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="password">Mot de passe</label>
+          <input id="password" type="password" class="form-control" name="password" required minlength="8" />
+          <div class="form-text">
+            8 caractères minimum, avec au moins une majuscule, une minuscule et un chiffre.
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="role">Rôle</label>
+          <select class="form-select" id="role" name="role" required>
+            <option value="" disabled selected>Choisir un rôle</option>
+            <option value="admin">Administrateur</option>
+            <option value="manager">Manager</option>
+            <option value="employee">Employé</option>
+          </select>
+        </div>
+        <div class="mb-3" id="field-department_id" hidden>
+          <label class="form-label" for="department-id">ID département</label>
+          <input id="department-id" type="text" class="form-control" name="department_id" />
+        </div>
+        <div class="mb-3" id="field-employee_id" hidden>
+          <label class="form-label" for="employee-id">ID employé (optionnel)</label>
+          <input id="employee-id" type="text" class="form-control" name="employee_id" />
+        </div>
+        <button type="submit" class="btn btn-primary">Créer</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const roleSelect = document.getElementById("role");
+  const departmentField = document.getElementById("field-department_id");
+  const employeeField = document.getElementById("field-employee_id");
+
+  function syncRoleFields() {
+    departmentField.hidden = roleSelect.value !== "manager";
+    departmentField.querySelector("input").required = roleSelect.value === "manager";
+    employeeField.hidden = roleSelect.value !== "employee";
+  }
+
+  roleSelect.addEventListener("change", syncRoleFields);
+  syncRoleFields();
+</script>
+{% endblock %}

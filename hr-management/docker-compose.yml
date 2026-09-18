@@ -8,6 +8,12 @@ services:
       - ./firestore.rules:/srv/firestore.rules:ro
       - ./firestore.indexes.json:/srv/firestore.indexes.json:ro
       - ./storage.rules:/srv/storage.rules:ro
+      # A named volume, not a host bind-mount: the emulator's export
+      # deletes and recreates this directory on every export, and that
+      # rmdir reliably fails with EBUSY on a Windows bind-mount (Docker
+      # Desktop/WSL2 filesystem quirk) — a Docker-managed volume doesn't
+      # have that limitation.
+      - emulator-data:/srv/emulator-data
     ports:
       - "8080:8080" # Firestore
       - "9099:9099" # Auth (stood up per spec; unused by app logic yet — custom JWT)
@@ -28,6 +34,7 @@ services:
       - ./app:/app/app
       - ./scripts:/app/scripts
       - ./tests:/app/tests
+      - ./ml:/app/ml
     ports:
       - "8000:8000"
     env_file:
@@ -41,3 +48,6 @@ services:
     depends_on:
       firebase-emulators:
         condition: service_healthy
+
+volumes:
+  emulator-data:

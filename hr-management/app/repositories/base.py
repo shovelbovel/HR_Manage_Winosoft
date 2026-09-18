@@ -9,10 +9,20 @@ relationnelles absentes" in the cahier des charges.
 
 from __future__ import annotations
 
+from datetime import date, datetime, timezone
+
 from google.cloud import firestore
 
 _UNIQUES_COLLECTION = "_uniques"
 _COUNTERS_COLLECTION = "_counters"
+
+
+def date_to_utc_datetime(value: date) -> datetime:
+    """A date-only value is stored as midnight UTC, per the cahier des
+    charges' Firestore conventions: "les dates sont stockées en horodatage
+    UTC. Une date seule est enregistrée à minuit UTC."
+    """
+    return datetime(value.year, value.month, value.day, tzinfo=timezone.utc)
 
 
 class AlreadyExistsError(Exception):
@@ -77,6 +87,17 @@ def increment_counter(db: firestore.Client, counter_name: str, delta: int = 1) -
         return new_value
 
     return _bump(db.transaction())
+
+
+def get_counter_value(db: firestore.Client, counter_name: str) -> int:
+    """Plain read of _counters/{counter_name} — no transaction, since a
+    dashboard KPI card doesn't need the stricter consistency
+    increment_counter's transaction provides for writers.
+    """
+    snapshot = db.collection(_COUNTERS_COLLECTION).document(counter_name).get()
+    if not snapshot.exists:
+        return 0
+    return snapshot.get("value") or 0
 
 
 def build_search_tokens(*fields: str) -> list[str]:

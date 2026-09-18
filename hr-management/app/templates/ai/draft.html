@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Assistant — Rédaction assistée — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Assistant — Rédaction assistée</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-stars"></i> Assistant — Rédaction assistée</h1>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <form method="post" action="/ai/draft">
+            <div class="mb-3">
+              <label class="form-label" for="draft-type">Type de document</label>
+              <select id="draft-type" class="form-select" name="draft_type" required>
+                <option value="job_description">Description de poste</option>
+                <option value="internal_letter">Courrier interne</option>
+                <option value="service_note">Note de service</option>
+                <option value="certificate_message">Message d'accompagnement d'attestation</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="context">Contexte</label>
+              <textarea id="context" class="form-control" name="context" rows="6" required maxlength="2000" placeholder="Décrivez ce que le document doit contenir…"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-stars"></i> Générer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      {% if result %}
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          Brouillon généré
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-button">
+            <i class="bi bi-clipboard"></i> Copier
+          </button>
+        </div>
+        <div class="card-body">
+          <pre id="draft-text" class="mb-0" style="white-space: pre-wrap; font-family: inherit;">{{ result }}</pre>
+        </div>
+      </div>
+      <script>
+        document.getElementById("copy-button").addEventListener("click", function () {
+          navigator.clipboard.writeText(document.getElementById("draft-text").textContent);
+        });
+      </script>
+      {% else %}
+      <p class="text-muted">Le brouillon généré s'affichera ici.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

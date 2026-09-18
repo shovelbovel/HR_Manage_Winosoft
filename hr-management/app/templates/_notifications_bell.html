@@ -1,0 +1,111 @@
+<div class="dropdown">
+  <button
+    class="btn btn-outline-secondary btn-sm position-relative"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <i class="bi bi-bell-fill"></i>
+    <span
+      id="notifications-badge"
+      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+    ></span>
+  </button>
+  <div class="dropdown-menu dropdown-menu-end p-0" style="width: 340px; max-height: 420px; overflow-y: auto;">
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+      <span class="fw-semibold small">Notifications</span>
+      <button type="button" id="notifications-mark-all-read" class="btn btn-link btn-sm p-0">
+        Tout marquer comme lu
+      </button>
+    </div>
+    <div id="notifications-list" class="list-group list-group-flush">
+      <div class="px-3 py-3 text-muted small">Chargement…</div>
+    </div>
+    <a href="/notifications" class="d-block text-center small py-2 border-top">Voir tout</a>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const CATEGORY_ICONS = {
+      contract_expiring: ["bi-exclamation-triangle-fill", "#E74C3C"],
+      internship_ending: ["bi-mortarboard-fill", "#F1C40F"],
+      trial_period: ["bi-hourglass-split", "#F1C40F"],
+      leave_pending: ["bi-calendar-check-fill", "#F1C40F"],
+      leave_decision: ["bi-calendar-check-fill", "#3498DB"],
+      birthday: ["bi-gift-fill", "#9B59B6"],
+      missing_documents: ["bi-file-earmark-excel-fill", "#95A5A6"],
+      new_employee: ["bi-person-plus-fill", "#27AE60"],
+    };
+
+    const badge = document.getElementById("notifications-badge");
+    const list = document.getElementById("notifications-list");
+    const markAllButton = document.getElementById("notifications-mark-all-read");
+
+    function renderBadge(count) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.classList.remove("d-none");
+      } else {
+        badge.classList.add("d-none");
+      }
+    }
+
+    function renderList(notifications) {
+      list.textContent = "";
+      if (notifications.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "px-3 py-3 text-muted small";
+        empty.textContent = "Aucune notification.";
+        list.appendChild(empty);
+        return;
+      }
+      for (const notification of notifications) {
+        const [iconClass, color] = CATEGORY_ICONS[notification.category] || ["bi-bell", "#95A5A6"];
+        const item = document.createElement("a");
+        item.href = notification.link || "/notifications";
+        item.className = "list-group-item list-group-item-action d-flex gap-2 align-items-start";
+        if (!notification.is_read) {
+          item.classList.add("bg-light", "fw-semibold");
+        }
+        item.addEventListener("click", function () {
+          if (!notification.is_read) {
+            navigator.sendBeacon("/notifications/" + notification.id + "/read");
+          }
+        });
+
+        const icon = document.createElement("i");
+        icon.className = "bi " + iconClass;
+        icon.style.color = color;
+
+        const text = document.createElement("span");
+        text.className = "small";
+        text.textContent = notification.message;
+
+        item.appendChild(icon);
+        item.appendChild(text);
+        list.appendChild(item);
+      }
+    }
+
+    function loadNotifications() {
+      fetch("/notifications/recent", { headers: { accept: "application/json" } })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => {
+          if (!data) return;
+          renderBadge(data.unread_count);
+          renderList(data.notifications);
+        })
+        .catch(() => {});
+    }
+
+    markAllButton.addEventListener("click", function () {
+      fetch("/notifications/mark-all-read", {
+        method: "POST",
+        headers: { accept: "application/json" },
+      }).then(loadNotifications);
+    });
+
+    loadNotifications();
+  })();
+</script>

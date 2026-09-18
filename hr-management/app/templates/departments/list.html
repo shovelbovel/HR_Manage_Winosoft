@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Départements — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Départements</li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-building"></i> Départements</h1>
+    <a href="/departments/create" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> Ajouter un département
+    </a>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% if departments %}
+  <div class="row row-cols-1 row-cols-md-3 g-3">
+    {% for department in departments %}
+    <div class="col">
+      <a href="/departments/{{ department.id }}" class="text-decoration-none text-body">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <span class="badge bg-secondary mb-2">{{ department.code }}</span>
+            <h2 class="h5 card-title">{{ department.name }}</h2>
+            <p class="card-text text-muted mb-0">
+              <i class="bi bi-people-fill"></i> {{ department.employee_count }} employé(s)
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a href="/departments?cursor={{ next_cursor }}" class="btn btn-outline-secondary">
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucun département pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

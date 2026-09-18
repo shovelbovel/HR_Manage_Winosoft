@@ -47,19 +47,10 @@ def test_dashboard_requires_auth(client):
     assert response.status_code == 401
 
 
-def test_dashboard_with_valid_cookie(client, seeded_admin):
-    settings = get_settings()
-    login_response = client.post(
-        "/login",
-        data={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
-        follow_redirects=False,
-    )
-    access_token = login_response.cookies.get(settings.cookie_name)
-
-    client.cookies.set(settings.cookie_name, access_token)
-    response = client.get("/dashboard")
+def test_dashboard_with_valid_cookie(admin_client):
+    response = admin_client.get("/dashboard")
     assert response.status_code == 200
-    assert ADMIN_EMAIL in response.text
+    assert "Tableau de bord" in response.text
 
 
 def test_lockout_after_5_failed_attempts(client, seeded_admin):

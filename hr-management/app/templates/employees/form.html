@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvel employé — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/employees">Personnel</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Nouvel employé</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% macro ai_badge(field) %}{% if prefill and prefill[field] %}<span class="badge bg-info-subtle text-info-emphasis ms-1"><i class="bi bi-stars"></i> IA</span>{% endif %}{% endmacro %}
+  <form method="post" action="/employees">
+    <div class="card mb-3">
+      <div class="card-header">Informations personnelles</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="first-name">Prénom {{ ai_badge("first_name") }}</label>
+          <input id="first-name" type="text" class="form-control" name="first_name" required maxlength="50" value="{% if prefill %}{{ prefill.first_name or '' }}{% endif %}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="last-name">Nom {{ ai_badge("last_name") }}</label>
+          <input id="last-name" type="text" class="form-control" name="last_name" required maxlength="50" value="{% if prefill %}{{ prefill.last_name or '' }}{% endif %}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="cin">CIN</label>
+          <input id="cin" type="text" class="form-control" name="cin" required placeholder="AB123456" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="birth-date">Date de naissance {{ ai_badge("birth_date") }}</label>
+          <input id="birth-date" type="date" class="form-control" name="birth_date" required value="{% if prefill %}{{ prefill.birth_date or '' }}{% endif %}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="phone">Téléphone {{ ai_badge("phone") }}</label>
+          <input id="phone" type="text" class="form-control" name="phone" required placeholder="0612345678" value="{% if prefill %}{{ prefill.phone or '' }}{% endif %}" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="professional-email">Email professionnel {{ ai_badge("professional_email") }}</label>
+          <input id="professional-email" type="email" class="form-control" name="professional_email" required value="{% if prefill %}{{ prefill.professional_email or '' }}{% endif %}" />
+        </div>
+      </div>
+    </div>
+    {% if prefill %}
+    <div class="alert alert-info d-flex align-items-center gap-2">
+      <i class="bi bi-stars"></i>
+      Certains champs ont été pré-remplis par l'assistant à partir du CV déposé — vérifiez-les avant d'enregistrer.
+    </div>
+    {% endif %}
+    {% if prefill and prefill.summary %}
+    <div class="card mb-3 panel-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1 text-primary">
+          <i class="bi bi-stars"></i>
+          <strong>Résumé du profil</strong>
+        </div>
+        <p class="{{ 'mb-2' if prefill.skills else 'mb-0' }}">{{ prefill.summary }}</p>
+        {% if prefill.skills %}
+        <div class="d-flex flex-wrap gap-2">
+          {% for skill in prefill.skills %}
+          <span class="badge rounded-pill text-bg-light border">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card mb-3">
+      <div class="card-header">Affectation</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="department_id">Département {{ ai_badge("suggested_department_id") }}</label>
+          <select class="form-select" id="department_id" name="department_id" required>
+            <option value="" {% if not (prefill and prefill.suggested_department_id) %}disabled selected{% endif %}>Choisir un département</option>
+            {% for department in departments %}
+            <option value="{{ department.id }}" {% if prefill and prefill.suggested_department_id == department.id %}selected{% endif %}>{{ department.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="position_id">Poste {{ ai_badge("suggested_position_id") }}</label>
+          <select class="form-select" id="position_id" name="position_id" required disabled>
+            <option value="" disabled selected>Choisir d'abord un département</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Contrat</div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="hire-date">Date d'embauche</label>
+          <input id="hire-date" type="date" class="form-control" name="hire_date" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="contract_type">Type de contrat {{ ai_badge("suggested_contract_type") }}</label>
+          <select class="form-select" id="contract_type" name="contract_type" required>
+            <option value="CDI" {% if prefill and prefill.suggested_contract_type == "CDI" %}selected{% endif %}>CDI</option>
+            <option value="CDD" {% if prefill and prefill.suggested_contract_type == "CDD" %}selected{% endif %}>CDD</option>
+            <option value="STAGE" {% if prefill and prefill.suggested_contract_type == "STAGE" %}selected{% endif %}>Stage</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="contract-start-date">Début</label>
+          <input id="contract-start-date" type="date" class="form-control" name="contract_start_date" required />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="contract_end_date">Fin</label>
+          <input type="date" class="form-control" id="contract_end_date" name="contract_end_date" />
+          <div class="form-text">Requis pour un CDD.</div>
+        </div>
+        <div class="col-md-6" id="contract_category_group">
+          <label class="form-label" for="contract_category">Catégorie (CDI)</label>
+          <select class="form-select" id="contract_category" name="contract_category">
+            <option value="" disabled selected>Choisir une catégorie</option>
+            <option value="CADRE">Cadre</option>
+            <option value="EMPLOYEE">Employé</option>
+            <option value="OUVRIER">Ouvrier</option>
+          </select>
+          <div class="form-text">Détermine la durée de la période d'essai.</div>
+        </div>
+        <div class="col-md-6" id="trial_end_date_override_group">
+          <label class="form-label" for="trial_end_date_override">Fin de période d'essai (stage)</label>
+          <input
+            type="date"
+            class="form-control"
+            id="trial_end_date_override"
+            name="trial_end_date_override"
+          />
+          <div class="form-text">Durée fixée par la convention de stage.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Données sensibles</div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="gross-salary">Salaire brut (MAD)</label>
+          <input id="gross-salary" type="number" class="form-control" name="gross_salary" step="0.01" min="0.01" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="rib">RIB (24 chiffres)</label>
+          <input id="rib" type="text" class="form-control" name="rib" required pattern="\d{24}" maxlength="24" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="cnss-number">Numéro CNSS</label>
+          <input id="cnss-number" type="text" class="form-control" name="cnss_number" required maxlength="20" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="emergency-contact-name">Contact d'urgence — nom</label>
+          <input id="emergency-contact-name" type="text" class="form-control" name="emergency_contact_name" required maxlength="100" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="emergency-contact-phone">Contact d'urgence — téléphone</label>
+          <input id="emergency-contact-phone" type="text" class="form-control" name="emergency_contact_phone" required placeholder="0612345678" />
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="internal-notes">Notes internes</label>
+          <textarea id="internal-notes" class="form-control" name="internal_notes" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    var contractTypeSelect = document.getElementById("contract_type");
+    var contractCategoryGroup = document.getElementById("contract_category_group");
+    var contractCategorySelect = document.getElementById("contract_category");
+    var trialOverrideGroup = document.getElementById("trial_end_date_override_group");
+    var trialOverrideInput = document.getElementById("trial_end_date_override");
+    var contractEndDateInput = document.getElementById("contract_end_date");
+
+    function syncContractFields() {
+      var isCdi = contractTypeSelect.value === "CDI";
+      var isStage = contractTypeSelect.value === "STAGE";
+
+      contractCategoryGroup.hidden = !isCdi;
+      contractCategorySelect.required = isCdi;
+      if (!isCdi) {
+        contractCategorySelect.value = "";
+      }
+
+      trialOverrideGroup.hidden = !isStage;
+      trialOverrideInput.required = isStage;
+      if (!isStage) {
+        trialOverrideInput.value = "";
+      }
+
+      contractEndDateInput.required = contractTypeSelect.value === "CDD";
+    }
+
+    contractTypeSelect.addEventListener("change", syncContractFields);
+    syncContractFields();
+  })();
+
+  (function () {
+    var departmentSelect = document.getElementById("department_id");
+    var positionSelect = document.getElementById("position_id");
+    var prefillPositionId = {{ (prefill.suggested_position_id if prefill and prefill.suggested_position_id else "") | tojson }};
+
+    function loadPositions(departmentId, selectPositionId) {
+      positionSelect.innerHTML = '<option value="" disabled selected>Chargement…</option>';
+      positionSelect.disabled = true;
+      if (!departmentId) {
+        return;
+      }
+      fetch("/positions?department_id=" + encodeURIComponent(departmentId), {
+        headers: { Accept: "application/json" },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (positions) {
+          positionSelect.innerHTML = "";
+          var placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.disabled = true;
+          placeholder.selected = !selectPositionId;
+          placeholder.textContent = positions.length
+            ? "Choisir un poste"
+            : "Aucun poste dans ce département";
+          positionSelect.appendChild(placeholder);
+          positions.forEach(function (position) {
+            var option = document.createElement("option");
+            option.value = position.id;
+            option.textContent = position.title;
+            if (position.id === selectPositionId) {
+              option.selected = true;
+            }
+            positionSelect.appendChild(option);
+          });
+          positionSelect.disabled = !positions.length;
+        });
+    }
+
+    departmentSelect.addEventListener("change", function () {
+      loadPositions(departmentSelect.value, null);
+    });
+
+    // AI suggestion pre-selected the department server-side (see the
+    // "selected" option above) — fetch its positions on load too, instead
+    // of waiting for a change event that will never fire on its own.
+    if (departmentSelect.value) {
+      loadPositions(departmentSelect.value, prefillPositionId || null);
+    }
+  })();
+</script>
+{% endblock %}

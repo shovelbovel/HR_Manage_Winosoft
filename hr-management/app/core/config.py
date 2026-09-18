@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
 
+    # Symmetric key for salary/RIB encryption (app.core.crypto). Required,
+    # no default: per cahier des charges "Gestion de la clé de chiffrement",
+    # this must never live in the codebase. Generate with
+    # `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+    fernet_key: str
+
     bcrypt_rounds: int = 12
     login_max_failed_attempts: int = 5
     login_lockout_minutes: int = 15
@@ -33,6 +39,12 @@ class Settings(BaseSettings):
     # even with deliverability/DNS checks disabled.
     seed_admin_email: str = "admin@hr-management.dev"
     seed_admin_password: str = "ChangeMe123!"
+
+    # Module 12 (Assistant intelligent) — optional, unlike fernet_key/
+    # jwt_secret_key: the module is disabled by default ("Le module est
+    # désactivé par défaut") and the app must run fully without a key set.
+    anthropic_api_key: str | None = None
+    anthropic_model: str = "claude-sonnet-5"
 
 
 @lru_cache

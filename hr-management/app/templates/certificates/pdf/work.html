@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<style>{% include "certificates/pdf/_style.html" %}</style>
+</head>
+<body>
+{% include "certificates/pdf/_header.html" %}
+
+<div class="title">Attestation de travail</div>
+
+<div class="body-text">
+  <p>
+    Nous soussignés, {{ data.name or "l'entreprise" }}, certifions que
+    <strong>{{ data.employee_name }}</strong>, matricule {{ data.matricule }},
+    occupe au sein de notre société le poste de <strong>{{ data.position_title }}</strong>
+    au département {{ data.department_name }}, depuis le {{ data.hire_date }}.
+  </p>
+  <p>
+    La présente attestation est délivrée à l'intéressé(e) pour servir et
+    valoir ce que de droit.
+  </p>
+</div>
+
+{% include "certificates/pdf/_footer.html" %}
+</body>
+</html>

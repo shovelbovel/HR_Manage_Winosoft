@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Générer une attestation — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/certificates">Attestations</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Générer</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card" style="max-width: 560px;">
+    <div class="card-body">
+      <form method="post" action="/certificates">
+        <div class="mb-3">
+          <label class="form-label" for="employee-id">ID employé</label>
+          <input id="employee-id"
+            type="text"
+            class="form-control"
+            name="employee_id"
+            required
+            value="{{ employee_id or '' }}"
+          />
+          <div class="form-text">
+            Consultable depuis la fiche employé ou la liste des congés.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="certificate_type">Type d'attestation</label>
+          <select class="form-select" id="certificate_type" name="certificate_type" required>
+            <option value="" disabled selected>Choisir un type</option>
+            <option value="work">Attestation de travail</option>
+            <option value="internship">Attestation de stage</option>
+            <option value="leave">Attestation de congé</option>
+            {% if current_user.role.value == "admin" %}
+            <option value="salary">Attestation de salaire</option>
+            <option value="end_of_contract">Certificat de fin de contrat</option>
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="mb-3" id="field-internship_subject" hidden>
+          <label class="form-label" for="internship-subject">Sujet du stage</label>
+          <input id="internship-subject" type="text" class="form-control" name="internship_subject" maxlength="200" />
+        </div>
+
+        <div class="mb-3" id="field-leave_id" hidden>
+          <label class="form-label" for="leave-id">ID du congé approuvé</label>
+          <input id="leave-id" type="text" class="form-control" name="leave_id" />
+        </div>
+
+        <div class="mb-3" id="field-net_salary" hidden>
+          <label class="form-label" for="net-salary">Salaire net mensuel (MAD)</label>
+          <input id="net-salary" type="number" class="form-control" name="net_salary" min="0" step="0.01" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Générer</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const typeSelect = document.getElementById("certificate_type");
+  const conditionalFields = {
+    internship: document.getElementById("field-internship_subject"),
+    leave: document.getElementById("field-leave_id"),
+    salary: document.getElementById("field-net_salary"),
+  };
+
+  function syncCertificateFields() {
+    for (const [type, field] of Object.entries(conditionalFields)) {
+      const shouldShow = typeSelect.value === type;
+      field.hidden = !shouldShow;
+      field.querySelector("input").required = shouldShow;
+    }
+  }
+
+  typeSelect.addEventListener("change", syncCertificateFields);
+  syncCertificateFields();
+</script>
+{% endblock %}

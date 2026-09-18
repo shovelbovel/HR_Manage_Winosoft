@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<style>{% include "certificates/pdf/_style.html" %}</style>
+</head>
+<body>
+{% include "certificates/pdf/_header.html" %}
+
+<div class="title">Attestation de congé</div>
+
+<div class="body-text">
+  <p>
+    Nous soussignés, {{ data.name or "l'entreprise" }}, certifions que
+    <strong>{{ data.employee_name }}</strong>, occupant le poste de
+    {{ data.position_title }} au département {{ data.department_name }},
+    a bénéficié d'un congé de type <strong>{{ data.leave_type_name }}</strong>,
+    du {{ data.start_date }} au {{ data.end_date }}, soit
+    {{ data.working_days }} jour(s) ouvré(s).
+  </p>
+  <p>
+    La présente attestation est délivrée à l'intéressé(e) pour servir et
+    valoir ce que de droit.
+  </p>
+</div>
+
+{% include "certificates/pdf/_footer.html" %}
+</body>
+</html>

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Périodes d'essai — HR Management{% endblock %}
+
+{% block content %}
+{% set STATUS_BADGES = {
+  "pending": ("En cours", "#F1C40F", "#000"),
+  "extended": ("Prolongée", "#F1C40F", "#000"),
+  "validated": ("Validée", "#27AE60", "#fff"),
+  "refused": ("Refusée", "#E74C3C", "#fff")
+} %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Périodes d'essai</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-hourglass-split"></i> Périodes d'essai {% if history %}— Historique{% else %}— En cours{% endif %}</h1>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% if rows %}
+  <div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+      <thead>
+        <tr>
+          <th>Employé</th>
+          <th>Contrat</th>
+          <th>Début</th>
+          <th>Fin prévue</th>
+          {% if not history %}
+          <th>Progression</th>
+          {% endif %}
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trial, progress in rows %}
+        {% set badge = STATUS_BADGES[trial.status.value] %}
+        <tr onclick="window.location='/trials/{{ trial.id }}'" style="cursor: pointer;">
+          <td><a href="/employees/{{ trial.employee_id }}" onclick="event.stopPropagation()">{{ trial.employee_id }}</a></td>
+          <td>{{ trial.contract_type.value }}{% if trial.contract_category %} / {{ trial.contract_category.value }}{% endif %}</td>
+          <td>{{ trial.start_date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ trial.effective_end_date.strftime('%Y-%m-%d') }}</td>
+          {% if not history %}
+          <td style="min-width: 140px;">
+            <div class="progress" style="height: 1.25rem;">
+              <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;">{{ progress }}%</div>
+            </div>
+          </td>
+          {% endif %}
+          <td>
+            <span class="badge" style="background-color: {{ badge[1] }}; color: {{ badge[2] }};">
+              {{ badge[0] }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a href="?cursor={{ next_cursor }}" class="btn btn-outline-secondary">
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucune période d'essai pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

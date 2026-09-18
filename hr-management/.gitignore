@@ -12,6 +12,10 @@ __pycache__/
 # Env / secrets
 .env
 *.local
+.env.prod
+secrets/
+*firebase-adminsdk*.json
+*serviceaccount*.json
 
 # Docker
 *.log

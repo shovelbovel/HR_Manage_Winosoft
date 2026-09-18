@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvelle demande de congé — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/leaves/my">Mes congés</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Nouvelle demande</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      <form method="post" action="/leaves">
+        <div class="mb-3">
+          <label class="form-label" for="leave-type-id">Type de congé</label>
+          <select id="leave-type-id" class="form-select" name="leave_type_id" required>
+            <option value="" disabled selected>Choisir un type</option>
+            {% for leave_type in leave_types %}
+            <option value="{{ leave_type.id }}">{{ leave_type.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label" for="start-date">Début</label>
+            <input id="start-date" type="date" class="form-control" name="start_date" required />
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="end-date">Fin</label>
+            <input id="end-date" type="date" class="form-control" name="end_date" required />
+          </div>
+        </div>
+        <div class="mb-3 mt-3">
+          <label class="form-label" for="reason">Motif (facultatif)</label>
+          <textarea id="reason" class="form-control" name="reason" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Soumettre la demande</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

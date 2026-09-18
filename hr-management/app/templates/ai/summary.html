@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Assistant — Synthèse — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid flex-grow-1">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Assistant — Synthèse</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-4"><i class="bi bi-stars"></i> Assistant — Synthèse du tableau de bord</h1>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% if text %}
+  <div class="card panel-card mb-4">
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-2 mb-2 text-primary">
+        <i class="bi bi-stars"></i>
+        <strong>Commentaire de l'assistant</strong>
+      </div>
+      <p class="mb-0">{{ text }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card stat-card--mint d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-card-value">{{ snapshot.employees_active }}</div>
+          <div class="stat-card-label">Employés actifs</div>
+        </div>
+        <i class="bi bi-people-fill stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card stat-card--blue d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-card-value">{{ snapshot.interns }}</div>
+          <div class="stat-card-label">Stagiaires</div>
+        </div>
+        <i class="bi bi-mortarboard-fill stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card stat-card--peach d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-card-value">{{ snapshot.leaves_pending }}</div>
+          <div class="stat-card-label">Congés en attente</div>
+        </div>
+        <i class="bi bi-calendar-check-fill stat-card-icon"></i>
+      </div>
+    </div>
+    {% if snapshot.departments_active is not none %}
+    <div class="col-6 col-lg-3">
+      <div class="stat-card stat-card--gray d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-card-value">{{ snapshot.departments_active }}</div>
+          <div class="stat-card-label">Départements actifs</div>
+        </div>
+        <i class="bi bi-building stat-card-icon"></i>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card panel-card h-100">
+        <div class="card-header bg-white">Employés par département</div>
+        <div class="card-body">
+          <canvas id="departmentChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card panel-card h-100">
+        <div class="card-header bg-white">Répartition par type de contrat</div>
+        <div class="card-body">
+          <canvas id="contractTypeChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card panel-card h-100">
+        <div class="card-header bg-white">
+          <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+          Contrats expirant sous 30 jours
+          <span class="badge bg-secondary">{{ snapshot.contracts_expiring | length }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card panel-card h-100">
+        <div class="card-header bg-white">
+          <i class="bi bi-hourglass-split text-warning"></i>
+          Périodes d'essai se terminant sous 15 jours
+          <span class="badge bg-secondary">{{ snapshot.trial_periods_ending_soon | length }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card panel-card h-100">
+        <div class="card-header bg-white">
+          <i class="bi bi-person-plus-fill" style="color:#27AE60"></i>
+          Nouvelles embauches ce mois-ci
+          <span class="badge bg-secondary">{{ snapshot.new_hires_this_month | length }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Chart.js loads via a <script src> near the end of base.html's <body>,
+  // after this block — calling new Chart() immediately here would run
+  // before the library exists (ReferenceError, canvas stays blank).
+  // DOMContentLoaded fires only once every script encountered during
+  // parsing (including that later one) has already run.
+  document.addEventListener("DOMContentLoaded", function () {
+    {% include "dashboard/_charts.js" %}
+  });
+</script>
+{% endblock %}

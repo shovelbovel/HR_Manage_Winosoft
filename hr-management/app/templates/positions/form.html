@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{% if position %}{{ position.title }}{% else %}Nouveau poste{% endif %} — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/positions">Postes</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {% if position %}{{ position.title }}{% else %}Nouveau{% endif %}
+      </li>
+    </ol>
+  </nav>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-body">
+      {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="{% if position %}/positions/{{ position.id }}{% else %}/positions{% endif %}">
+        <div class="mb-3">
+          <label for="department_id" class="form-label">Département</label>
+          {% if position %}
+          <input type="text" class="form-control" value="{{ position.department_name }}" disabled />
+          <div class="form-text">Le département est immuable après création.</div>
+          {% else %}
+          <select class="form-select" id="department_id" name="department_id" required>
+            <option value="" disabled selected>Choisir un département</option>
+            {% for department in departments %}
+            <option value="{{ department.id }}">{{ department.name }}</option>
+            {% endfor %}
+          </select>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label for="title" class="form-label">Intitulé</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            name="title"
+            required
+            maxlength="100"
+            value="{% if position %}{{ position.title }}{% endif %}"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="max_occupants" class="form-label">Nombre maximum d'occupants</label>
+          <input
+            type="number"
+            class="form-control"
+            id="max_occupants"
+            name="max_occupants"
+            min="1"
+            value="{% if position and position.max_occupants %}{{ position.max_occupants }}{% endif %}"
+          />
+          <div class="form-text">Laisser vide pour ne fixer aucune limite.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+
+      {% if position %}
+      <hr />
+      <form
+        method="post"
+        action="/positions/{{ position.id }}/delete"
+        data-confirm="Supprimer le poste « {{ position.title }} » ? Cette action est irréversible."
+        data-confirm-label="Supprimer"
+      >
+        <button type="submit" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-trash"></i> Supprimer ce poste
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ target_user.email }} — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/settings/users">Utilisateurs</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ target_user.email }}</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card mb-3" style="max-width: 480px;">
+    <div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-4">Email</dt>
+        <dd class="col-8">{{ target_user.email }}</dd>
+        <dt class="col-4">Rôle</dt>
+        <dd class="col-8">{{ target_user.role.value }}</dd>
+        {% if target_user.department_id %}
+        <dt class="col-4">Département</dt>
+        <dd class="col-8">{{ target_user.department_id }}</dd>
+        {% endif %}
+        {% if target_user.employee_id %}
+        <dt class="col-4">Employé lié</dt>
+        <dd class="col-8"><a href="/employees/{{ target_user.employee_id }}">{{ target_user.employee_id }}</a></dd>
+        {% endif %}
+        <dt class="col-4">Statut</dt>
+        <dd class="col-8">{{ "Actif" if target_user.is_active else "Inactif" }}</dd>
+      </dl>
+
+      {% if target_user.is_active %}
+      <form
+        method="post"
+        action="/settings/users/{{ target_user.id }}/deactivate"
+        class="mt-3"
+        data-confirm="Désactiver le compte {{ target_user.email }} ? Il ne pourra plus se connecter."
+        data-confirm-label="Désactiver"
+      >
+        <button type="submit" class="btn btn-outline-danger btn-sm">Désactiver ce compte</button>
+      </form>
+      {% else %}
+      <form method="post" action="/settings/users/{{ target_user.id }}/activate" class="mt-3">
+        <button type="submit" class="btn btn-outline-success btn-sm">Réactiver ce compte</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card" style="max-width: 480px;">
+    <div class="card-header">Réinitialiser le mot de passe</div>
+    <div class="card-body">
+      <form
+        method="post"
+        action="/settings/users/{{ target_user.id }}/reset-password"
+        data-confirm="Réinitialiser le mot de passe de {{ target_user.email }} ? L'ancien mot de passe cessera immédiatement de fonctionner."
+        data-confirm-label="Réinitialiser"
+        data-confirm-variant="btn-primary"
+      >
+        <div class="mb-3">
+          <label for="password" class="form-label">Nouveau mot de passe</label>
+          <input type="password" class="form-control" id="password" name="password" required minlength="8" />
+          <div class="form-text">
+            8 caractères minimum, avec au moins une majuscule, une minuscule et un chiffre.
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Réinitialiser</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

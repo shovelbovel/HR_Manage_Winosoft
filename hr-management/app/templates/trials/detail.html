@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Période d'essai — HR Management{% endblock %}
+
+{% block content %}
+{% set STATUS_BADGES = {
+  "pending": ("En cours", "#F1C40F", "#000"),
+  "extended": ("Prolongée", "#F1C40F", "#000"),
+  "validated": ("Validée", "#27AE60", "#fff"),
+  "refused": ("Refusée", "#E74C3C", "#fff")
+} %}
+{% set badge = STATUS_BADGES[trial.status.value] %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/trials">Périodes d'essai</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Détail</li>
+    </ol>
+  </nav>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card" style="max-width: 560px;">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h2 class="h5 mb-0">
+          <a href="/employees/{{ trial.employee_id }}">{{ trial.employee_id }}</a>
+        </h2>
+        <span class="badge" style="background-color: {{ badge[1] }}; color: {{ badge[2] }};">
+          {{ badge[0] }}
+        </span>
+      </div>
+
+      <div class="progress mb-3" style="height: 1.5rem;">
+        <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%;">
+          {{ progress_percent }}%
+        </div>
+      </div>
+
+      <dl class="row">
+        <dt class="col-4">Contrat</dt>
+        <dd class="col-8">
+          {{ trial.contract_type.value }}{% if trial.contract_category %} / {{ trial.contract_category.value }}{% endif %}
+        </dd>
+        <dt class="col-4">Début</dt>
+        <dd class="col-8">{{ trial.start_date.strftime('%Y-%m-%d') }}</dd>
+        <dt class="col-4">Fin initiale</dt>
+        <dd class="col-8">{{ trial.initial_end_date.strftime('%Y-%m-%d') }}</dd>
+        {% if trial.extended_end_date %}
+        <dt class="col-4">Fin après prolongation</dt>
+        <dd class="col-8">{{ trial.extended_end_date.strftime('%Y-%m-%d') }}</dd>
+        {% endif %}
+        {% if trial.decision_reason %}
+        <dt class="col-4">Motif</dt>
+        <dd class="col-8">{{ trial.decision_reason }}</dd>
+        {% endif %}
+      </dl>
+
+      {% if can_decide %}
+      <hr />
+      <div class="d-flex flex-column gap-2">
+        <form method="post" action="/trials/{{ trial.id }}/validate" class="d-flex gap-2">
+          <input type="text" class="form-control" name="reason" placeholder="Motif" required maxlength="500" />
+          <button type="submit" class="btn btn-success text-nowrap">
+            <i class="bi bi-check-lg"></i> Valider
+          </button>
+        </form>
+        {% if can_extend %}
+        <form method="post" action="/trials/{{ trial.id }}/extend" class="d-flex gap-2">
+          <input type="text" class="form-control" name="reason" placeholder="Motif" required maxlength="500" />
+          <button type="submit" class="btn btn-warning text-nowrap">
+            <i class="bi bi-arrow-repeat"></i> Prolonger
+          </button>
+        </form>
+        {% endif %}
+        <form method="post" action="/trials/{{ trial.id }}/refuse" class="d-flex gap-2">
+          <input type="text" class="form-control" name="reason" placeholder="Motif" required maxlength="500" />
+          <button type="submit" class="btn btn-outline-danger text-nowrap">
+            <i class="bi bi-x-lg"></i> Refuser
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

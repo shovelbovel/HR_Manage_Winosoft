@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres — Congés — HR Management{% endblock %}
+
+{% block content %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Paramètres — Congés</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-gear-fill"></i> Paramètres</h1>
+  {% include "settings/_nav.html" %}
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <h2 class="h5">Types de congés</h2>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm bg-white align-middle">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Nom</th>
+              <th>Jours/an</th>
+              <th>Déductible</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for leave_type in leave_types %}
+            <tr>
+              <td>{{ leave_type.code }}</td>
+              <td>{{ leave_type.name }}</td>
+              <td>{{ leave_type.default_days_per_year if leave_type.default_days_per_year is not none else "—" }}</td>
+              <td>{{ "Oui" if leave_type.is_deductible else "Non" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Ajouter un type de congé</div>
+        <div class="card-body">
+          <form method="post" action="/settings/leaves/leave-types">
+            <div class="row g-2">
+              <div class="col-6">
+                <label for="leave-type-code" class="form-label">Code</label>
+                <input type="text" class="form-control" id="leave-type-code" name="code" required maxlength="20" placeholder="ex. SPECIAL" />
+              </div>
+              <div class="col-6">
+                <label for="leave-type-name" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="leave-type-name" name="name" required maxlength="100" />
+              </div>
+              <div class="col-6">
+                <label for="leave-type-days" class="form-label">Jours/an (optionnel)</label>
+                <input type="number" class="form-control" id="leave-type-days" name="default_days_per_year" min="0" />
+              </div>
+              <div class="col-3 d-flex align-items-end">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_deductible" value="true" id="is_deductible" />
+                  <label class="form-check-label" for="is_deductible">Déductible</label>
+                </div>
+              </div>
+              <div class="col-3 d-flex align-items-end">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="requires_justification" value="true" id="requires_justification" />
+                  <label class="form-check-label" for="requires_justification">Justificatif requis</label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm mt-3">Ajouter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <h2 class="h5">Jours fériés</h2>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm bg-white align-middle">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for holiday in holidays %}
+            <tr>
+              <td>{{ holiday.name }}</td>
+              <td>
+                {{ "%02d"|format(holiday.day) }}/{{ "%02d"|format(holiday.month) }}{% if holiday.year %}/{{ holiday.year }}{% endif %}
+              </td>
+              <td>{{ "Récurrent" if holiday.is_recurring else "Ponctuel" }}</td>
+              <td>
+                <form
+                  method="post"
+                  action="/settings/leaves/holidays/{{ holiday.id }}/delete"
+                  data-confirm="Supprimer le jour férié « {{ holiday.name }} » ?"
+                  data-confirm-label="Supprimer"
+                >
+                  <button type="submit" class="btn btn-link btn-sm text-danger p-0" aria-label="Supprimer {{ holiday.name }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Ajouter un jour férié</div>
+        <div class="card-body">
+          <form method="post" action="/settings/leaves/holidays">
+            <div class="row g-2">
+              <div class="col-12">
+                <label for="holiday-name" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="holiday-name" name="name" required maxlength="100" placeholder="ex. Aïd al-Fitr" />
+              </div>
+              <div class="col-4">
+                <label for="holiday-day" class="form-label">Jour</label>
+                <input type="number" class="form-control" id="holiday-day" name="day" required min="1" max="31" />
+              </div>
+              <div class="col-4">
+                <label for="holiday-month" class="form-label">Mois</label>
+                <input type="number" class="form-control" id="holiday-month" name="month" required min="1" max="12" />
+              </div>
+              <div class="col-4" id="holiday-year-field">
+                <label for="holiday-year" class="form-label">Année</label>
+                <input type="number" class="form-control" id="holiday-year" name="year" min="2020" />
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_recurring" value="true" id="is_recurring" checked />
+                  <label class="form-check-label" for="is_recurring">
+                    Récurrent (fête du calendrier grégorien, même date chaque année)
+                  </label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm mt-3">Ajouter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const isRecurringCheckbox = document.getElementById("is_recurring");
+  const yearField = document.getElementById("holiday-year-field");
+  const yearInput = yearField.querySelector("input");
+
+  function syncYearField() {
+    const recurring = isRecurringCheckbox.checked;
+    yearField.hidden = recurring;
+    yearInput.required = !recurring;
+  }
+
+  isRecurringCheckbox.addEventListener("change", syncYearField);
+  syncYearField();
+</script>
+{% endblock %}

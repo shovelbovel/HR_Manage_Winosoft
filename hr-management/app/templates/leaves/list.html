@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — HR Management{% endblock %}
+
+{% block content %}
+{% set STATUS_BADGES = {
+  "pending": ("En attente", "#F1C40F", "#000"),
+  "approved": ("Approuvé", "#27AE60", "#fff"),
+  "rejected": ("Refusé", "#E74C3C", "#fff")
+} %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ '/home' if current_user.role.value == 'employee' else '/dashboard' }}">
+          {{ 'Accueil' if current_user.role.value == 'employee' else 'Tableau de bord' }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3">{{ title }}</h1>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% if leaves %}
+  <div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+      <thead>
+        <tr>
+          {% if show_employee_column %}
+          <th>Employé</th>
+          {% endif %}
+          <th>Type</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Jours ouvrés</th>
+          <th>Statut</th>
+          {% if show_decide_actions %}
+          <th>Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for leave in leaves %}
+        {% set badge = STATUS_BADGES[leave.status.value] %}
+        <tr>
+          {% if show_employee_column %}
+          <td><a href="/leaves/{{ leave.id }}">{{ leave.employee_name }}</a></td>
+          <td>{{ leave.leave_type_name }}</td>
+          {% else %}
+          <td><a href="/leaves/{{ leave.id }}">{{ leave.leave_type_name }}</a></td>
+          {% endif %}
+          <td>{{ leave.start_date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ leave.end_date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ leave.working_days }}</td>
+          <td>
+            <span class="badge" style="background-color: {{ badge[1] }}; color: {{ badge[2] }};">
+              {{ badge[0] }}
+            </span>
+          </td>
+          {% if show_decide_actions %}
+          <td>
+            <form method="post" action="/leaves/{{ leave.id }}/approve" class="d-inline">
+              <button type="submit" class="btn btn-success btn-sm">
+                <i class="bi bi-check-lg"></i>
+              </button>
+            </form>
+            <a href="/leaves/{{ leave.id }}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if next_cursor %}
+  <div class="mt-3">
+    <a href="?cursor={{ next_cursor }}" class="btn btn-outline-secondary">
+      Page suivante <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="text-muted">Aucune demande.</p>
+  {% endif %}
+</div>
+{% endblock %}

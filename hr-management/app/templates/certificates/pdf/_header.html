@@ -1,0 +1,10 @@
+<div class="header">
+  <div class="company-name">{{ data.name or "Raison sociale non configurée" }}</div>
+  <div class="company-details">
+    {%- if data.address %}{{ data.address }}{% endif -%}
+    {%- if data.ice %} — ICE : {{ data.ice }}{% endif -%}
+    {%- if data.rc %} — RC : {{ data.rc }}{% endif -%}
+    {%- if data.if_number %} — IF : {{ data.if_number }}{% endif -%}
+  </div>
+</div>
+<div class="certificate-number">N° {{ certificate.number }}</div>

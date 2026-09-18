@@ -1,0 +1,194 @@
+[
+  {
+    "id": "cdi_full_info",
+    "cv_text": "Ahmed Idrissi\nEmail : ahmed.idrissi@example.com\nTelephone : 0661234567\nDate de naissance : 14/06/1989\n\nIngenieur logiciel senior avec 9 ans d'experience en developpement backend Python et Java. A la recherche d'un poste en CDI a Casablanca.\n\nExperience :\n- Lead Developer, TechnoSoft (2019-2026)\n- Backend Developer, DataCorp (2017-2019)\n\nFormation : Ingenieur d'Etat en Informatique, ENSIAS",
+    "ground_truth": {
+      "first_name": "Ahmed",
+      "last_name": "Idrissi",
+      "professional_email": "ahmed.idrissi@example.com",
+      "phone": "0661234567",
+      "birth_date": "1989-06-14",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "stage_fin_etudes",
+    "cv_text": "Yasmine Bennani\nyasmine.bennani@example.com\n0677889900\n\nEtudiante en 5eme annee, cycle ingenieur informatique. Recherche un stage de fin d'etudes de 6 mois en developpement web, a partir de fevrier.\n\nCompetences : JavaScript, React, Node.js\nFormation : Ecole Nationale des Sciences Appliquees",
+    "ground_truth": {
+      "first_name": "Yasmine",
+      "last_name": "Bennani",
+      "professional_email": "yasmine.bennani@example.com",
+      "phone": "0677889900",
+      "birth_date": null,
+      "suggested_contract_type": "STAGE"
+    }
+  },
+  {
+    "id": "cdd_explicite",
+    "cv_text": "Karim El Fassi\nKarim.elfassi@example.com\nTel : 0622334455\nNe le 03/09/1994\n\nComptable disponible immediatement pour un CDD de 6 mois (remplacement conge maternite). Experience de 5 ans en comptabilite generale.\n\nExperience : Comptable, Cabinet Fiduciaire Atlas (2020-2026)",
+    "ground_truth": {
+      "first_name": "Karim",
+      "last_name": "El Fassi",
+      "professional_email": "karim.elfassi@example.com",
+      "phone": "0622334455",
+      "birth_date": "1994-09-03",
+      "suggested_contract_type": "CDD"
+    }
+  },
+  {
+    "id": "sans_telephone",
+    "cv_text": "Salma Zerouali\nEmail professionnel : salma.zerouali@example.com\nDate de naissance : 22/11/1996\n\nChargee de recrutement avec 3 ans d'experience en ressources humaines. Recherche un poste en CDI.\n\nFormation : Master Ressources Humaines, Universite Hassan II",
+    "ground_truth": {
+      "first_name": "Salma",
+      "last_name": "Zerouali",
+      "professional_email": "salma.zerouali@example.com",
+      "phone": null,
+      "birth_date": "1996-11-22",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "sans_date_naissance",
+    "cv_text": "Omar Chraibi\nomar.chraibi@example.com\n0688990011\n\nTechnicien de maintenance industrielle, 7 ans d'experience. Recherche un CDI dans le secteur industriel.\n\nExperience : Technicien senior, Industries Marocaines SA (2018-2026)",
+    "ground_truth": {
+      "first_name": "Omar",
+      "last_name": "Chraibi",
+      "professional_email": "omar.chraibi@example.com",
+      "phone": "0688990011",
+      "birth_date": null,
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "type_contrat_ambigu",
+    "cv_text": "Nadia Alaoui\nnadia.alaoui@example.com\n0655667788\nNee le 05/01/1992\n\nDesigner graphique freelance depuis 4 ans, travaille avec plusieurs agences de communication sur des projets ponctuels.\n\nCompetences : Photoshop, Illustrator, Figma",
+    "ground_truth": {
+      "first_name": "Nadia",
+      "last_name": "Alaoui",
+      "professional_email": "nadia.alaoui@example.com",
+      "phone": "0655667788",
+      "birth_date": "1992-01-05",
+      "suggested_contract_type": null
+    }
+  },
+  {
+    "id": "stage_phrasing_alternative",
+    "cv_text": "Rachid Bouzid\nrachid.bouzid@example.com\n0699887766\n\nEtudiant en derniere annee de Master Informatique, je suis a la recherche d'un stage pratique de 4 mois pour valider ma formation, de preference dans le developpement backend.\n\nCompetences : Python, FastAPI, SQL",
+    "ground_truth": {
+      "first_name": "Rachid",
+      "last_name": "Bouzid",
+      "professional_email": "rachid.bouzid@example.com",
+      "phone": "0699887766",
+      "birth_date": null,
+      "suggested_contract_type": "STAGE"
+    }
+  },
+  {
+    "id": "cdi_cadre_confirme",
+    "cv_text": "Fatima Zahra Amrani\nfz.amrani@example.com\n0611223344\nDate de naissance : 30/07/1985\n\nDirectrice commerciale avec 12 ans d'experience dans le secteur de la distribution. A la recherche d'un poste en CDI a responsabilites.\n\nExperience : Directrice commerciale regionale, GroupeDistrib (2016-2026)\nFormation : ESC Rabat",
+    "ground_truth": {
+      "first_name": "Fatima Zahra",
+      "last_name": "Amrani",
+      "professional_email": "fz.amrani@example.com",
+      "phone": "0611223344",
+      "birth_date": "1985-07-30",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "email_format_inhabituel",
+    "cv_text": "Hicham Tazi\nContact : h.tazi.pro2026@example.com\nMobile : 0633445566\nNe le 18/02/1991\n\nAnalyste financier, 6 ans d'experience. Recherche un CDI dans une institution bancaire.\n\nFormation : Master Finance, ISCAE",
+    "ground_truth": {
+      "first_name": "Hicham",
+      "last_name": "Tazi",
+      "professional_email": "h.tazi.pro2026@example.com",
+      "phone": "0633445566",
+      "birth_date": "1991-02-18",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "cdi_mi_carriere",
+    "cv_text": "Imane Sekkat\nimane.sekkat@example.com\n0644556677\nDate de naissance : 09/12/1987\n\nResponsable qualite avec 8 ans d'experience dans l'industrie agroalimentaire. Recherche un poste stable en CDI.\n\nExperience : Responsable qualite, AgroMaroc (2019-2026)\nFormation : Ingenieur Agroalimentaire, IAV Hassan II",
+    "ground_truth": {
+      "first_name": "Imane",
+      "last_name": "Sekkat",
+      "professional_email": "imane.sekkat@example.com",
+      "phone": "0644556677",
+      "birth_date": "1987-12-09",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "cv_minimal",
+    "cv_text": "Youssef Benkirane\n\nDeveloppeur mobile, competences en Flutter et Kotlin. 3 ans d'experience dans une startup casablancaise.",
+    "ground_truth": {
+      "first_name": "Youssef",
+      "last_name": "Benkirane",
+      "professional_email": null,
+      "phone": null,
+      "birth_date": null,
+      "suggested_contract_type": null
+    }
+  },
+  {
+    "id": "caracteres_accentues",
+    "cv_text": "Laïla Idrissi\nlaila.idrissi@example.com\n0666778899\nNée le 25/04/1993\n\nAssistante de direction bilingue français/arabe, 5 ans d'expérience. Recherche un poste en CDI.\n\nFormation : Licence en Langues Étrangères Appliquées",
+    "ground_truth": {
+      "first_name": "Laïla",
+      "last_name": "Idrissi",
+      "professional_email": "laila.idrissi@example.com",
+      "phone": "0666778899",
+      "birth_date": "1993-04-25",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "telephone_format_inhabituel",
+    "cv_text": "Zakaria Fahmi\nzakaria.fahmi@example.com\nTel : 06.12.34.56.78\nNe le 11/10/1990\n\nChef de projet IT, 8 ans d'experience. Recherche un CDI.\n\nExperience : Chef de projet, SolutionsTech (2018-2026)",
+    "ground_truth": {
+      "first_name": "Zakaria",
+      "last_name": "Fahmi",
+      "professional_email": "zakaria.fahmi@example.com",
+      "phone": "0612345678",
+      "birth_date": "1990-10-11",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "entete_cv_decoratif",
+    "cv_text": "CURRICULUM VITAE\n=================\n\nNOM ET PRENOM : Ouazzani Zineb\nEMAIL : zineb.ouazzani@example.com\nGSM : 0677112233\nDATE DE NAISSANCE : 02/02/1995\n\n--- PROFIL PROFESSIONNEL ---\nJuriste d'entreprise, 4 ans d'experience en droit des affaires. Recherche un poste en CDI.\n\n--- EXPERIENCE ---\nJuriste, Cabinet Juridique Maghreb (2021-2026)",
+    "ground_truth": {
+      "first_name": "Zineb",
+      "last_name": "Ouazzani",
+      "professional_email": "zineb.ouazzani@example.com",
+      "phone": "0677112233",
+      "birth_date": "1995-02-02",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "cv_bilingue",
+    "cv_text": "Mehdi Slaoui\nEmail: mehdi.slaoui@example.com\nPhone: 0688776655\nDOB: 19/05/1992\n\nFull-stack Developer with 6 years of experience in React and Django. Actively seeking a permanent position (CDI) in Casablanca.\n\nExperience: Senior Full-stack Developer, WebFactory (2020-2026)\nEducation: Engineering degree, EMI",
+    "ground_truth": {
+      "first_name": "Mehdi",
+      "last_name": "Slaoui",
+      "professional_email": "mehdi.slaoui@example.com",
+      "phone": "0688776655",
+      "birth_date": "1992-05-19",
+      "suggested_contract_type": "CDI"
+    }
+  },
+  {
+    "id": "signal_contrat_contradictoire",
+    "cv_text": "Amine Berrada\namine.berrada@example.com\n0655443322\nNe le 07/07/1991\n\nActuellement en CDI chez FinancePro en tant qu'analyste, mais ouvert a une mission CDD ponctuelle de courte duree sur un projet specifique si l'opportunite se presente.\n\nExperience : Analyste financier, FinancePro (2019-2026)",
+    "ground_truth": {
+      "first_name": "Amine",
+      "last_name": "Berrada",
+      "professional_email": "amine.berrada@example.com",
+      "phone": "0655443322",
+      "birth_date": "1991-07-07",
+      "suggested_contract_type": null
+    }
+  }
+]

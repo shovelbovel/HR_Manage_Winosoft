@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres — Assistant — HR Management{% endblock %}
+
+{% block content %}
+{% set FUNCTION_LABELS = {
+  "cv_import": "Import de CV",
+  "draft": "Rédaction assistée",
+  "summary": "Synthèse des indicateurs"
+} %}
+
+<div class="container flex-grow-1 py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Paramètres — Assistant</li>
+    </ol>
+  </nav>
+  <h1 class="h3"><i class="bi bi-gear-fill"></i> Paramètres</h1>
+  {% include "settings/_nav.html" %}
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <h2 class="h5">Assistant intelligent</h2>
+      <div class="card">
+        <div class="card-body">
+          <form method="post" action="/settings/ai">
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="enabled"
+                  value="true"
+                  id="enabled"
+                  {% if ai_settings and ai_settings.enabled %}checked{% endif %}
+                />
+                <label class="form-check-label" for="enabled">Activer l'assistant</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="daily-quota-per-user">Quota quotidien par utilisateur</label>
+              <input id="daily-quota-per-user"
+                type="number"
+                class="form-control"
+                name="daily_quota_per_user"
+                min="1"
+                value="{{ ai_settings.daily_quota_per_user if ai_settings else 20 }}"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="monthly-quota-global">Quota mensuel global</label>
+              <input id="monthly-quota-global"
+                type="number"
+                class="form-control"
+                name="monthly_quota_global"
+                min="1"
+                value="{{ ai_settings.monthly_quota_global if ai_settings else 500 }}"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <h2 class="h5">Journal des appels récents</h2>
+      {% if recent_calls %}
+      <div class="table-responsive">
+        <table class="table table-sm bg-white align-middle">
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Fonction</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in recent_calls %}
+            <tr>
+              <td>{{ entry.user_id }}</td>
+              <td>{{ FUNCTION_LABELS[entry.function.value] }}</td>
+              <td>{{ entry.created_at.strftime("%d/%m/%Y %H:%M") }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted">Aucun appel enregistré pour le moment.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

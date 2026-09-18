@@ -1,0 +1,22 @@
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item">
+    <a class="nav-link {% if request.url.path == '/settings/company' %}active{% endif %}" href="/settings/company">
+      <i class="bi bi-building"></i> Entreprise
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if request.url.path == '/settings/leaves' %}active{% endif %}" href="/settings/leaves">
+      <i class="bi bi-calendar-check"></i> Congés
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if request.url.path.startswith('/settings/users') %}active{% endif %}" href="/settings/users">
+      <i class="bi bi-people-fill"></i> Utilisateurs
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if request.url.path == '/settings/ai' %}active{% endif %}" href="/settings/ai">
+      <i class="bi bi-stars"></i> Assistant
+    </a>
+  </li>
+</ul>

@@ -1,0 +1,23 @@
+name: hr-management-prod
+
+services:
+  app:
+    image: hr-management-app-prod:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.prod
+    environment:
+      # Deliberately does NOT set FIRESTORE_EMULATOR_HOST /
+      # FIREBASE_AUTH_EMULATOR_HOST / FIREBASE_STORAGE_EMULATOR_HOST — their
+      # absence is what makes app/core/firestore_client.py take the real
+      # (non-emulator) branch and talk to actual Firestore.
+      - GOOGLE_CLOUD_PROJECT=pfa-winosoft
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/firebase-service-account.json
+      - ENVIRONMENT=prod
+    volumes:
+      - ./secrets/firebase-service-account.json:/app/secrets/firebase-service-account.json:ro
